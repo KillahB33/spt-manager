@@ -1,0 +1,13 @@
+services:
+  spt:
+    build: .
+    args:
+      SPT_VERSION: 3.9.5
+    ports:
+      - "6969:6969"
+    environment:
+      SPT_LOG_REQUESTS: "true"
+      SPT_BACKEND_IP: 127.0.0.1
+    volumes:
+      - config:/app/SPT_Data/Server
+      - user:/app/user
