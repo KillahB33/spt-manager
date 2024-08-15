@@ -3,6 +3,7 @@
 HOST_CONTAINER_IP=`awk 'END{print $1}' /etc/hosts`
 CONTAINER_IP=${HOST_CONTAINER_IP:-127.0.0.1}
 BACKEND_IP=${SPT_BACKEND_IP:-127.0.0.1}
+NEXT_PUBLIC_SPT_VERSION=${SPT_VERSION}
 
 echo "Replacing configuration with container ip_addr $CONTAINER_IP"
 
