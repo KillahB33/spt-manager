@@ -9,7 +9,6 @@ import {
 } from "@mantine/core";
 import {
   MdArrowForward,
-  MdCloudDownload,
   MdCheckCircle,
   MdError,
 } from "react-icons/md";
@@ -52,12 +51,12 @@ const AddModForm: React.FC = () => {
   return (
     <Flex
       mih={50}
-      bg="rgba(0, 0, 0, .3)"
       gap="md"
       justify="flex-end"
       align="center"
       direction="row"
       wrap="nowrap"
+      pr="10px"
     >
       <Text size="lg">Add Mod</Text>
       <TextInput

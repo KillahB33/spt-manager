@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
 import SevenZip from '7zip-min'; // Import 7zip-min
+import { getDownloadUrl } from './github-util';
+import axios from 'axios';
 
 const updateModFromGitHub = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'POST') {
@@ -17,15 +18,10 @@ const updateModFromGitHub = async (req: NextApiRequest, res: NextApiResponse) =>
 
     try {
         // Fetch the specific release page content
-        const assetPage = await axios.get(githubUrl);
-        const assetRegex = /href="([^"]+\.(zip|7z))"/;
-        const assetMatch = assetPage.data.match(assetRegex);
-
-        if (!assetMatch) {
-            return res.status(400).json({ error: 'No zip or 7z file found in the specified release.' });
+        const assetUrl = await getDownloadUrl(githubUrl);
+        if (!assetUrl) {
+            throw new Error('Failed to retrieve the asset URL');
         }
-
-        const assetUrl = `https://github.com${assetMatch[1]}`;
         const assetResponse = await axios.get(assetUrl, { responseType: 'arraybuffer' });
 
         // Extract mod path and save the file

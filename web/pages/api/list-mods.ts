@@ -1,18 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
 import { Mod } from '../../types';
-
-const getLatestReleaseVersion = async (repo: string): Promise<string> => {
-    try {
-        const response = await axios.get(`https://api.github.com/repos/${repo}/releases/latest`);
-        return response.data.tag_name;
-    } catch (error) {
-        console.error('Error fetching latest release:', error);
-        return ''; // Handle errors appropriately
-    }
-};
+import { getLatestReleaseVersion } from './github-util';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'GET') {
@@ -29,8 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
             // Check the latest version
-            const repo = folder; // Assuming folder name is the repo name; adjust as needed
-            const latestVersion = await getLatestReleaseVersion(repo);
+            const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
+            const latestVersion = await getLatestReleaseVersion(githubUrl);
             const updateAvailable = Boolean(latestVersion && latestVersion !== packageJson.version);
 
             return {
