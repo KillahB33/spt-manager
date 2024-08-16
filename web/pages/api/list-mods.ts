@@ -18,27 +18,32 @@ export default async function handler(
     const modFolders = fs.readdirSync(modsDir);
 
     const mods: Mod[] = await Promise.all(
-      modFolders.map(async (folder) => {
-        const packageJsonPath = path.join(modsDir, folder, "package.json");
-        const packageJson = JSON.parse(
-          fs.readFileSync(packageJsonPath, "utf-8")
-        );
+      modFolders
+        .filter((folder) => {
+          const fullPath = path.join(modsDir, folder);
+          return fs.statSync(fullPath).isDirectory();
+        })
+        .map(async (folder) => {
+          const packageJsonPath = path.join(modsDir, folder, "package.json");
+          const packageJson = JSON.parse(
+            fs.readFileSync(packageJsonPath, "utf-8")
+          );
 
-        // Check the latest version
-        const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
-        const latestVersion = await getLatestReleaseVersion(githubUrl);
-        const updateAvailable = Boolean(
-          latestVersion && latestVersion !== packageJson.version
-        );
+          // Check the latest version
+          const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
+          const latestVersion = await getLatestReleaseVersion(githubUrl);
+          const updateAvailable = Boolean(
+            latestVersion && latestVersion !== packageJson.version
+          );
 
-        return {
-          name: folder,
-          author: packageJson.author,
-          version: packageJson.version,
-          sptVersion: packageJson.sptVersion,
-          update: updateAvailable,
-        };
-      })
+          return {
+            name: folder,
+            author: packageJson.author,
+            version: packageJson.version,
+            sptVersion: packageJson.sptVersion,
+            update: updateAvailable,
+          };
+        })
     );
     res.status(200).json({ mods });
   } catch (error) {
