@@ -7,21 +7,45 @@ import {
   useMantineTheme,
   Modal,
 } from "@mantine/core";
-import {
-  MdArrowForward,
-  MdCheckCircle,
-  MdError,
-} from "react-icons/md";
+import { MdArrowForward, MdCheckCircle, MdError } from "react-icons/md";
 import { useField } from "@mantine/form";
 
 const AddModForm: React.FC = () => {
   const theme = useMantineTheme();
   const [message, setMessage] = useState<string>("");
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [inputWidth, setInputWidth] = useState<number>(500); // Set an initial width
 
-  const field = useField({
-    initialValue: "https://www.github.com",
+  const field = useField<string>({
+    initialValue: "",
+    onValueChange: (value) => {
+      // Calculate width based on input length
+      const minWidth = 500; // Minimum width
+      const maxWidth = 800; // Maximum width
+      const newWidth = Math.min(
+        Math.max(minWidth, value.length * 10 + 20),
+        maxWidth
+      );
+      setInputWidth(newWidth);
+    },
   });
+
+  const handleFocus = () => {
+    const value = field.getValue();
+    const minWidth = 500;
+    const maxWidth = 800;
+    const newWidth = Math.min(
+      Math.max(minWidth, value.length * 10 + 20),
+      maxWidth
+    );
+    setInputWidth(newWidth);
+  };
+
+  const handleBlur = () => {
+    if (!field.getValue()) {
+      setInputWidth(300); // Reset the width if the input is empty
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -30,7 +54,7 @@ const AddModForm: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url: field.getValue() }), // Note the change here
+        body: JSON.stringify({ url: field.getValue() }),
       });
 
       const data = await response.json();
@@ -65,6 +89,9 @@ const AddModForm: React.FC = () => {
         size="md"
         placeholder="release github url"
         rightSectionWidth={42}
+        style={{ width: `${inputWidth}px`, transition: "width 0.3s ease" }}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         rightSection={
           <ActionIcon
             size={30}
