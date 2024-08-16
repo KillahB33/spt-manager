@@ -15,7 +15,7 @@ const ModTable: React.FC = () => {
   useEffect(() => {
     const fetchMods = async () => {
       try {
-        const response = await fetch("/api/mods");
+        const response = await fetch("/api/list-mods");
         const data = await response.json();
         setMods(data.mods);
       } catch (error) {
