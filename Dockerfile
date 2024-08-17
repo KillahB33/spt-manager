@@ -43,6 +43,7 @@ ENV NODE_ENV production
 COPY --from=builder /app/web/public /app/web/public
 COPY --from=builder /app/web/.next/standalone /app/web/
 COPY --from=builder /app/web/.next/static /app/web/.next/static
+COPY web/binaries /app/web/node_modules/node-7z-archive/
 
 # Copy the build SPT Server
 COPY --from=sptbuilder /app/project/build /app
