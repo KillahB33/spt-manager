@@ -62,7 +62,7 @@ const ModTable: React.FC = () => {
   };
 
   if (loading) {
-    return <Text>Loading mods...</Text>;
+    return <Text ta="center" pt="10px">Loading mods...</Text>;
   }
 
   return (

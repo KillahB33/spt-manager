@@ -31,10 +31,13 @@ export default async function handler(
 
           // Check the latest version
           const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
-          const latestVersion = await getLatestReleaseVersion(githubUrl);
-          const updateAvailable = Boolean(
-            latestVersion && latestVersion !== packageJson.version
-          );
+          let updateAvailable = false;
+          if (githubUrl) {
+            const latestVersion = await getLatestReleaseVersion(githubUrl);
+            updateAvailable = Boolean(
+              latestVersion && latestVersion !== packageJson.version
+            );
+          }
 
           return {
             name: folder,

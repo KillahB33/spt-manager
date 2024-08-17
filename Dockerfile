@@ -10,6 +10,7 @@ RUN apk add git git-lfs
 # Fetch server components and build
 FROM git AS fetch
 ARG SPT_VERSION=3.9.5
+ENV NEXT_PUBLIC_SPT_VERSION=${SPT_VERSION}}
 ARG GIT_CLONE_PROTECTION_ACTIVE=false
 WORKDIR /repo
 RUN git clone https://dev.sp-tarkov.com/SPT/Server.git . && \
@@ -43,7 +44,7 @@ ENV NODE_ENV production
 COPY --from=builder /app/web/public /app/web/public
 COPY --from=builder /app/web/.next/standalone /app/web/
 COPY --from=builder /app/web/.next/static /app/web/.next/static
-COPY web/binaries /app/web/node_modules/node-7z-archive/
+COPY web/binaries /app/web/node_modules/node-7z-archive/binaries
 
 # Copy the build SPT Server
 COPY --from=sptbuilder /app/project/build /app
@@ -56,6 +57,12 @@ VOLUME /app/SPT_Data/Server
 
 # Copy Supervisord config
 COPY supervisord.conf .
+
+# Chown app
+RUN chown -R node:node /app
+
+# Switch to non-root user
+USER node
 
 # Expose ports (adjust if necessary)
 EXPOSE 3000
