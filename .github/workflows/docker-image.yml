@@ -1,0 +1,24 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+    
+env:
+  SPT_VERSION: 3.9.5
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --build-arg SPT_VERSION=${{ env.SPT_VERSION }} --tag ghcr.io/killahb33/spt-manager:${{ env.SPT_VERSION }}
+    - name: Login to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Push Docker image
+      run: |
+        docker push ghcr.io/killahb33/spt-manager:${{ env.SPT_VERSION }}

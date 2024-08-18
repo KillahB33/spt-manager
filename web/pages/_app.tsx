@@ -1,6 +1,5 @@
 import '@mantine/core/styles.css';
 import type { AppProps } from 'next/app';
-import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { Header } from '../components/Header';
 

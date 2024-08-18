@@ -1,3 +1,6 @@
+# Set SPT Version
+ARG SPT_VERSION=3.9.5
+
 # Base image with common dependencies
 FROM node:20.11.1-alpine AS base
 RUN apk update && \
@@ -9,8 +12,7 @@ RUN apk add git git-lfs
 
 # Fetch server components and build
 FROM git AS fetch
-ARG SPT_VERSION=3.9.5
-ENV NEXT_PUBLIC_SPT_VERSION=${SPT_VERSION}}
+ARG SPT_VERSION
 ARG GIT_CLONE_PROTECTION_ACTIVE=false
 WORKDIR /repo
 RUN git clone https://dev.sp-tarkov.com/SPT/Server.git . && \
@@ -28,6 +30,8 @@ RUN yarn run build:release
 
 # Build the Nextjs App
 FROM base AS builder
+ARG SPT_VERSION
+ENV NEXT_PUBLIC_SPT_VERSION=${SPT_VERSION}
 WORKDIR /app/web
 COPY web/package*.json ./
 RUN npm install
