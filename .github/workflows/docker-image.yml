@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
     
 env:
-  SPT_VERSION: 3.9.5
+  SPT_VERSION: 3.9.6
 
 jobs:
 
