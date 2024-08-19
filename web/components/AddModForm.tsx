@@ -81,6 +81,7 @@ const AddModForm: React.FC = () => {
       direction="row"
       wrap="nowrap"
       pr="10px"
+      pb="20px"
     >
       <Text size="lg">Add Mod</Text>
       <TextInput

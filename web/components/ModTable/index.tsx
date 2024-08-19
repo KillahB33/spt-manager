@@ -67,10 +67,9 @@ const ModTable: React.FC = () => {
 
   return (
     <ScrollArea
-      h={300}
+      h={600}
       w="90%"
       m="0 auto"
-      pt="20px"
       onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
     >
       <Table miw={700}>
