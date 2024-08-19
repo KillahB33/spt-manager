@@ -45,6 +45,7 @@ export default async function handler(
             version: packageJson.version,
             sptVersion: packageJson.sptVersion,
             update: updateAvailable,
+            githubUrl: packageJson.githubUrl,
           };
         })
     );
