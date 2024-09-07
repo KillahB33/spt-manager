@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDownloadUrl, extractAndClean } from "./github-util";
-import { setUpdateRequired } from './states';
+import { setRestartRequired } from "./states";
 
 const addModFromGitHub = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
@@ -27,7 +27,7 @@ const addModFromGitHub = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const modName = await extractAndClean(assetUrl);
-    setUpdateRequired(true);
+    setRestartRequired(true);
     res.status(200).json({ message: `${modName} added successfully` });
   } catch (error) {
     console.error("Error adding mod:", error);

@@ -1,7 +1,7 @@
-let updateRequired = false;
+let restartRequired = false;
 
-export const setUpdateRequired = (value: boolean) => {
-  updateRequired = value;
+export const setRestartRequired = (value: boolean) => {
+  restartRequired = value;
 };
 
-export const getUpdateRequired = () => updateRequired;
+export const getRestartRequired = () => restartRequired;

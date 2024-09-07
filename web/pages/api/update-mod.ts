@@ -6,7 +6,7 @@ import {
   extractAndClean,
   getLatestReleaseVersion,
 } from "./github-util";
-import { setUpdateRequired } from "./states";
+import { setRestartRequired } from "./states";
 
 const updateModFromGitHub = async (
   req: NextApiRequest,
@@ -44,7 +44,7 @@ const updateModFromGitHub = async (
     // Clean existing files
     await fs.promises.rm(modPath, { recursive: true });
     const modName = await extractAndClean(assetUrl);
-    setUpdateRequired(true);
+    setRestartRequired(true);
     res.status(200).json({ message: `${modName} updated successfully` });
   } catch (error) {
     console.error("Error updating mod:", error);
