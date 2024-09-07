@@ -15,41 +15,65 @@ export default async function handler(
   try {
     // Read the mod directory and parse mod data
     const modsDir = path.join("/app", "user", "mods");
-    const modFolders = fs.readdirSync(modsDir);
 
-    const mods: Mod[] = await Promise.all(
-      modFolders
-        .filter((folder) => {
-          const fullPath = path.join(modsDir, folder);
-          return fs.statSync(fullPath).isDirectory();
-        })
-        .map(async (folder) => {
-          const packageJsonPath = path.join(modsDir, folder, "package.json");
-          const packageJson = JSON.parse(
-            fs.readFileSync(packageJsonPath, "utf-8")
-          );
+    const pathExists = fs.existsSync(modsDir);
 
-          // Check the latest version
-          const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
-          let updateAvailable = false;
-          if (githubUrl) {
-            const latestVersion = await getLatestReleaseVersion(githubUrl);
-            updateAvailable = Boolean(
-              latestVersion && latestVersion !== packageJson.version
+    let files = [];
+
+    if (pathExists) {
+      files = fs.readdirSync(modsDir);
+    }
+
+    if (pathExists && files.length > 0) {
+      const modFolders = fs.readdirSync(modsDir);
+      const mods: Mod[] = await Promise.all(
+        modFolders
+          .filter((folder) => {
+            const fullPath = path.join(modsDir, folder);
+            return fs.statSync(fullPath).isDirectory();
+          })
+          .map(async (folder) => {
+            const packageJsonPath = path.join(modsDir, folder, "package.json");
+            const packageJson = JSON.parse(
+              fs.readFileSync(packageJsonPath, "utf-8")
             );
-          }
 
-          return {
-            name: folder,
-            author: packageJson.author,
-            version: packageJson.version,
-            sptVersion: packageJson.sptVersion,
-            update: updateAvailable,
-            githubUrl: packageJson.githubUrl,
-          };
-        })
-    );
-    res.status(200).json({ mods });
+            // Check the latest version
+            const githubUrl = packageJson.githubUrl; // Assuming folder name is the repo name; adjust as needed
+            let updateAvailable = false;
+            if (githubUrl) {
+              const latestVersion = await getLatestReleaseVersion(githubUrl);
+              updateAvailable = Boolean(
+                latestVersion && latestVersion !== packageJson.version
+              );
+            }
+
+            return {
+              name: folder,
+              author: packageJson.author,
+              version: packageJson.version,
+              sptVersion: packageJson.sptVersion,
+              update: updateAvailable,
+              githubUrl: packageJson.githubUrl,
+            };
+          })
+      );
+      res.status(200).json({ mods });
+    } else {
+      if (!pathExists) {
+        fs.mkdirSync(modsDir, { recursive: true });
+      }
+      const mods: Mod[] = [
+        {
+          name: "SPTManager: Add Mods to Populate this table",
+          author: "KillahB33",
+          version: "fake",
+          sptVersion: "fake",
+          update: false,
+        },
+      ];
+      res.status(200).json({ mods });
+    }
   } catch (error) {
     console.error("Error fetching mods:", error);
     res.status(500).json({ error: "Failed to fetch mods" });
