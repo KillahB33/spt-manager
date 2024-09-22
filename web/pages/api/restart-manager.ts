@@ -4,7 +4,7 @@ import { exec } from "child_process";
 
 const restartManager = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    exec("supervisorctl restart sptserver", (error, stdout, stderr) => {
+    exec("supervisorctl -c /app/supervisord.conf restart sptserver", (error, stdout, stderr) => {
       if (error) {
         console.error(`Error restarting service: ${error.message}`);
         return res.status(500).json({ message: "Failed to restart service" });
