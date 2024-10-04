@@ -56,26 +56,6 @@ export async function getDownloadUrl(
   return null;
 }
 
-function waitForFile(filePath: string, maxAttempts: number = 10, interval: number = 1000): Promise<void> {
-  return new Promise((resolve, reject) => {
-    let attempts = 0;
-    const checkFile = async () => {
-      try {
-        await fs.access(filePath, fs.constants.F_OK);
-        resolve();
-      } catch (err) {
-        if (attempts < maxAttempts) {
-          attempts++;
-          setTimeout(checkFile, interval);
-        } else {
-          reject(new Error(`File ${filePath} not found after ${maxAttempts} attempts`));
-        }
-      }
-    };
-    checkFile();
-  });
-}
-
 export async function extractAndClean(
   assetUrl: string,
   baseModPath: string = "/app/user/mods",
@@ -96,32 +76,21 @@ export async function extractAndClean(
     await fs.promises.writeFile(archiveFilePath, assetResponse.data);
 
     // Extract the archive
-    fullArchive(archiveFilePath, archiveDir).then(async function () {
-      // Clean up
-      fs.unlinkSync(archiveFilePath);
-      // Update package.json with the GitHub URL
-      const packageJsonPath = path.join(modPath, "package.json");
-      let packageJson: { [key: string]: any } = {};
+    await fullArchive(archiveFilePath, archiveDir);
 
-      // Wait for the package.json file to exist
-      await waitForFile(packageJsonPath);
+    // Clean up
+    fs.unlinkSync(archiveFilePath);
+    // Update package.json with the GitHub URL
+    const packageJsonPath = path.join(modPath, "package.json");
+    
+    const fileBuffer = await fs.promises.readFile(packageJsonPath, 'utf-8');
+    const file = JSON.parse(fileBuffer);
 
-      if (fs.existsSync(packageJsonPath)) {
-        const fileContent = await fs.readFile(packageJsonPath, "utf-8");
-        packageJson = JSON.parse(fileContent);
-        console.log("Existing package.json read");
-      } else {
-        console.log("package.json not found");
-        throw new Error("package.json not found");
-      }
-  
-      // Update or add the githubUrl property
-      packageJson.githubUrl = assetUrl;
-  
-      // Write the updated or new package.json
-      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-      console.log("package.json updated/created successfully");
-    });
+    file.githubUrl = assetUrl;
+
+    // Write the updated or new package.json
+    await fs.promises.writeFile(packageJsonPath, JSON.stringify(file, null, 2));
+    console.log("package.json updated successfully");
 
     return modName;
   } catch (error) {
